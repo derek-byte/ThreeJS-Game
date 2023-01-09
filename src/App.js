@@ -10,6 +10,8 @@ function App() {
       const scene = new THREE.Scene();
 
       var stars=[];
+      var trees=[];
+      var speed = 0.5;
 
       const camera = new THREE.PerspectiveCamera(75, window?.innerWidth / window?.innerHeight, 0.1, 1000);
 
@@ -70,21 +72,42 @@ function App() {
       moon.position.y = -8;
       // moon.position.setX(3);
 
-      const group = new THREE.Group()
+      function addTrees() {
+        for (var t=0; t < 5; t++) {
+          const group = new THREE.Group()
+          const geometryTree = new THREE.BoxGeometry( 4, 4, 6 );
+          const materialTree = new THREE.MeshBasicMaterial( {color: 0x36852e, side: THREE.DoubleSide} );
+          const planeTree = new THREE.Mesh( geometryTree, materialTree );
+          const edgesTree = new THREE.EdgesGeometry( geometryTree );
+          const lineTree = new THREE.LineSegments( edgesTree, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+    
+          const geometryTrunk = new THREE.BoxGeometry( 2, 2, 3 );
+          const materialTrunk = new THREE.MeshBasicMaterial( {color: 0x5c5558, side: THREE.DoubleSide} );
+          const planeTrunk = new THREE.Mesh( geometryTrunk, materialTrunk );
+          group.add( planeTree, lineTree, planeTrunk );
+          
+          group.position.x = Math.random() * 50 - 25;
+          group.position.y = Math.random() * 100 - 25;
 
-      const geometryTree = new THREE.BoxGeometry( 4, 4, 6 );
-      const materialTree = new THREE.MeshBasicMaterial( {color: 0x36852e, side: THREE.DoubleSide} );
-      const planeTree = new THREE.Mesh( geometryTree, materialTree );
-      const edgesTree = new THREE.EdgesGeometry( geometryTree );
-      const lineTree = new THREE.LineSegments( edgesTree, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+          planeTree.position.z = -10;
+          planeTrunk.position.z = -6;
+          
+          scene.add( group );
+          trees.push(group); 
+        }
+        console.log(trees)
+      }
 
-      const geometryTrunk = new THREE.BoxGeometry( 2, 2, 3 );
-      const materialTrunk = new THREE.MeshBasicMaterial( {color: 0x5c5558, side: THREE.DoubleSide} );
-      const planeTrunk = new THREE.Mesh( geometryTrunk, materialTrunk );
-      scene.add( planeTree, lineTree, planeTrunk );
-
-      planeTree.position.z = -10;
-      planeTrunk.position.z = -6;
+      function animateTrees() { 
+        for(let i=0; i<trees.length; i++) {
+            trees[i].position.y -=  speed;
+            if(trees[i].position.y<-50) {
+              trees[i].position.y+=75; 
+              trees[i].position.x = Math.random() * 50 - 25;
+            }
+        }
+        speed += 0.0001;
+      }
       // planeTree.position.y = -8;
       // planeTree.position.setX(3);
 
@@ -100,8 +123,6 @@ function App() {
       camera.position.z = t * -0.012;
       camera.position.x = t * -0.000;
       camera.position.y = t * -0.01;
-
-      console.log(camera.position.z, camera.position.x, camera.rotation.y)
 
       // camera.position.z = t * -0.01;
       // camera.position.x = t * -0.0002;
@@ -179,7 +200,6 @@ function App() {
           iceKeysPressed[key] = -xSpeed;
           delete iceKeysPressed['a'];
         } 
-        console.log(key, iceKeysPressed)
       }
 
       function iceMoves() {
@@ -206,20 +226,22 @@ function App() {
       });
 
       function animate() {
-      requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
 
-      moon.rotation.x += 0.0001;
-      moon.rotation.y += 0.001;
-      moon.rotation.z += 0.01;
-      
-      controls.update();
+        moon.rotation.x += 0.0001;
+        moon.rotation.y += 0.001;
+        moon.rotation.z += 0.01;
+        
+        controls.update();
 
-      renderer.render(scene, camera);
-      animateStars();
-      iceMoves();
+        renderer.render(scene, camera);
+        animateStars();
+        animateTrees();
+        iceMoves();
       }
       
       addSphere();
+      addTrees();
       animate();
   }, []) 
 
