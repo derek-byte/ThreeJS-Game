@@ -59,7 +59,7 @@ function App() {
       const controls = new OrbitControls(camera, renderer.domElement);
 
       const moon = new THREE.Mesh(
-      new THREE.SphereGeometry(3, 32, 32),
+      new THREE.BoxGeometry(3, 3, 3),
       new THREE.MeshBasicMaterial({
         color: 0x4c91a8, 
         side: THREE.DoubleSide
@@ -227,10 +227,6 @@ function App() {
 
       function animate() {
         requestAnimationFrame(animate);
-
-        moon.rotation.x += 0.0001;
-        moon.rotation.y += 0.001;
-        moon.rotation.z += 0.01;
         
         controls.update();
 
