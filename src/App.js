@@ -164,76 +164,96 @@ function App() {
           }
       }
 
-      let keysPressed = {};
       let iceKeysPressed = {};
-      var xSpeed = -0.25;
+      let keysPressed;
+      var xSpeed = -0.5;
       var ySpeed = 0.25;
-      var friction = 0.98;
+      var friction = 0.9;
 
-      document.addEventListener('keydown', (event) => {
-        keysPressed[event.key] = true;
+      var onKeyDown = function ( event ) {
+        iceKeysPressed = {};
      
-        if (keysPressed['w']) {
-          moon.position.y += ySpeed;
-        } else if (keysPressed['s']) {
-          moon.position.y -= ySpeed;
-        } 
-        if (keysPressed['a']) {
-          moon.position.x -= xSpeed;
-        } else if (keysPressed['d']) {
-          moon.position.x += xSpeed;
-        } 
-      });
+        // if (keysPressed['w']) {
+        //   moon.position.y += ySpeed;
+        // } else if (keysPressed['s']) {
+        //   moon.position.y -= ySpeed;
+        // } 
+        switch ( event.keyCode ) {
+          case 68: // d
+            keysPressed = 'd';
+            break;
+					case 65: // a
+            keysPressed = 'a'
+            break;
+          default:
+        }
+      };
 
-      function addIceEffect(key) {
-        if (key === 'w') {
-          iceKeysPressed[key] = ySpeed;
-          delete iceKeysPressed['s'];
-        } else if (key === 's') {
-          iceKeysPressed[key] = ySpeed;
-          delete iceKeysPressed['w'];
-        } 
-        if (key === 'a') {
-          iceKeysPressed[key] = -xSpeed;
-          delete iceKeysPressed['d'];
-        } else if (key === 'd') {
-          iceKeysPressed[key] = -xSpeed;
-          delete iceKeysPressed['a'];
-        } 
+      function onKeysPressed() {
+        if (keysPressed === 'a') {
+          moon.position.x -= xSpeed;
+        } else if (keysPressed === 'd') {
+          moon.position.x += xSpeed;
+        }
+
+      }
+
+      function addIceEffect(event) {
+        // if (key === 'w') {
+        //   iceKeysPressed[key] = ySpeed;
+        //   delete iceKeysPressed['s'];
+        // } else if (key === 's') {
+        //   iceKeysPressed[key] = ySpeed;
+        //   delete iceKeysPressed['w'];
+        // } 
+        switch ( event.keyCode ) {
+          case 68: // d
+            iceKeysPressed['d'] = -xSpeed;
+            delete iceKeysPressed['a'];
+            break;
+					case 65: // a
+            iceKeysPressed['a'] = -xSpeed;
+            delete iceKeysPressed['d'];
+            break;
+          default:
+        }
       }
 
       function iceMoves() {
         // console.log(iceKeysPressed)
         if (iceKeysPressed['a'] > 0.1) {
-          moon.position.x += iceKeysPressed['a'];
           iceKeysPressed['a'] *= friction;
+          moon.position.x += iceKeysPressed['a'];
         } else if (iceKeysPressed['d'] > 0.1) {
-          moon.position.x -= iceKeysPressed['d'];
           iceKeysPressed['d'] *= friction; 
+          moon.position.x -= iceKeysPressed['d'];
         }
-        if (iceKeysPressed['w'] > 0.1) {
-          moon.position.y += iceKeysPressed['w'];
-          iceKeysPressed['w'] *= friction;
-        } else if (iceKeysPressed['s'] > 0.1) {
-          moon.position.y -= iceKeysPressed['s'];
-          iceKeysPressed['s'] *= friction;
-        }  
+        // if (iceKeysPressed['w'] > 0.1) {
+        //   moon.position.y += iceKeysPressed['w'];
+        //   iceKeysPressed['w'] *= friction;
+        // } else if (iceKeysPressed['s'] > 0.1) {
+        //   moon.position.y -= iceKeysPressed['s'];
+        //   iceKeysPressed['s'] *= friction;
+        // }  
       }
      
       document.addEventListener('keyup', (event) => {
-        addIceEffect(event.key)
-        delete keysPressed[event.key];
+        addIceEffect(event);
+        keysPressed = '';
+        // delete keysPressed[event.key];
       });
+      document.addEventListener( 'keydown', onKeyDown, false );
 
       function animate() {
         requestAnimationFrame(animate);
-        
-        controls.update();
 
         renderer.render(scene, camera);
         animateStars();
         animateTrees();
+        onKeysPressed();
         iceMoves();
+
+        controls.update();
       }
       
       addSphere();
