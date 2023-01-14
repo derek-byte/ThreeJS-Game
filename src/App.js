@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useState} from 'react';
 import './App.css';
 
 function App() {
-  const ref = useRef(null);
+  const ref = useRef(null); 
+  const [isPlaying, setIsPlaying] = useState(true);
 
   useEffect(() => {
       const scene = new THREE.Scene();
@@ -95,7 +96,6 @@ function App() {
           scene.add( group );
           trees.push(group); 
         }
-        console.log(trees)
       }
 
       function animateTrees() { 
@@ -167,7 +167,7 @@ function App() {
       let iceKeysPressed = {};
       let keysPressed;
       var xSpeed = -0.5;
-      var ySpeed = 0.25;
+      // var ySpeed = 0.25;
       var friction = 0.9;
 
       var onKeyDown = function ( event ) {
@@ -187,14 +187,32 @@ function App() {
             break;
           default:
         }
+        // if (keysPressed === 'a' && moon.position.x >= 25-3) { // 3 is box size
+        //   keysPressed = ""
+        //   iceKeysPressed = {}
+        // } else if (keysPressed === 'd' && moon.position.x <= -25+3) {
+        //   keysPressed = ""
+        //   iceKeysPressed = {}
+        // }
       };
 
       function onKeysPressed() {
-        if (keysPressed === 'a') {
+        if (keysPressed === 'a' && moon.position.x < 25-3) { // 3 is box size
           moon.position.x -= xSpeed;
-        } else if (keysPressed === 'd') {
+          iceKeysPressed['d'] = 0
+        } else if (keysPressed === 'd' && moon.position.x > -25+3) {
           moon.position.x += xSpeed;
-        }
+          iceKeysPressed['a'] = 0
+        } 
+
+        if (moon.position.x >= 25-3)  // 3 is box size
+          iceKeysPressed['a'] = 0
+        else if (moon.position.x <= -25+3)  // 3 is box size
+          iceKeysPressed['d'] = 0
+        // else {
+        //   delete iceKeysPressed['a']
+        //   delete iceKeysPressed['d']
+        // }
 
       }
 
@@ -220,11 +238,10 @@ function App() {
       }
 
       function iceMoves() {
-        // console.log(iceKeysPressed)
-        if (iceKeysPressed['a'] > 0.1) {
+        if (iceKeysPressed['a'] > 0.1 && keysPressed === '') {
           iceKeysPressed['a'] *= friction;
           moon.position.x += iceKeysPressed['a'];
-        } else if (iceKeysPressed['d'] > 0.1) {
+        } else if (iceKeysPressed['d'] > 0.1 && keysPressed === '') {
           iceKeysPressed['d'] *= friction; 
           moon.position.x -= iceKeysPressed['d'];
         }
@@ -235,6 +252,15 @@ function App() {
         //   moon.position.y -= iceKeysPressed['s'];
         //   iceKeysPressed['s'] *= friction;
         // }  
+      }
+
+      function checkHit() {
+        // for(let i=0; i<trees.length; i++) {
+        //   if((trees[i].position.y-1 < moon.position.y < trees[i].position.y+1) && (trees[i].position.x-1 < moon.position.x < trees[i].position.x+1)) {
+        //     // setIsPlaying(false)
+        //     console.log("Hia", trees[i].position.y-1, moon.position.y, trees[i].position.y+1, trees[i].position.y-1 < moon.position.y < trees[i].position.y+1)
+        //   }
+        // }
       }
      
       document.addEventListener('keyup', (event) => {
@@ -248,17 +274,22 @@ function App() {
         requestAnimationFrame(animate);
 
         renderer.render(scene, camera);
+
+        checkHit();
+        onKeysPressed();
         animateStars();
         animateTrees();
-        onKeysPressed();
-        iceMoves();
+        if (keysPressed === "") {
+          iceMoves();
+        }
 
         controls.update();
       }
       
       addSphere();
       addTrees();
-      animate();
+      if (isPlaying === true)
+        animate();
   }, []) 
 
   return(
