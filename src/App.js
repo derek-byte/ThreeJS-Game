@@ -69,8 +69,8 @@ function App() {
 
       scene.add(moon);
 
-      moon.position.z = -7;
-      moon.position.y = -8;
+      moon.position.setZ(-7);
+      moon.position.setY(-8);
       // moon.position.setX(3);
 
       function addTrees() {
@@ -85,13 +85,13 @@ function App() {
           const geometryTrunk = new THREE.BoxGeometry( 2, 2, 3 );
           const materialTrunk = new THREE.MeshBasicMaterial( {color: 0x5c5558, side: THREE.DoubleSide} );
           const planeTrunk = new THREE.Mesh( geometryTrunk, materialTrunk );
-          group.add( planeTree, lineTree, planeTrunk );
+          group.add( planeTrunk, planeTree, lineTree );
           
-          group.position.x = Math.random() * 50 - 25;
-          group.position.y = Math.random() * 100 - 25;
+          group.position.setX(Math.random() * 50 - 25);
+          group.position.setY(Math.random() * 100 - 25);
 
-          planeTree.position.z = -10;
-          planeTrunk.position.z = -6;
+          planeTree.position.setZ(-10);
+          planeTrunk.position.setZ(-6);
           
           scene.add( group );
           trees.push(group); 
@@ -255,12 +255,13 @@ function App() {
       }
 
       function checkHit() {
-        // for(let i=0; i<trees.length; i++) {
-        //   if((trees[i].position.y-1 < moon.position.y < trees[i].position.y+1) && (trees[i].position.x-1 < moon.position.x < trees[i].position.x+1)) {
-        //     // setIsPlaying(false)
-        //     console.log("Hia", trees[i].position.y-1, moon.position.y, trees[i].position.y+1, trees[i].position.y-1 < moon.position.y < trees[i].position.y+1)
-        //   }
-        // }
+        for(let i=0; i<trees.length; i++) {
+          if(trees[i].position.y-2 < moon.position.y && moon.position.y < trees[i].position.y+2 && trees[i].position.x-2 < moon.position.x && moon.position.x < trees[i].position.x+2) {
+            setIsPlaying(false);
+            console.log(trees[i].position, moon.position)
+            console.log("MOON", moon.position.y+8, moon.position.x, moon.position.z)
+          }
+        }
       }
      
       document.addEventListener('keyup', (event) => {
@@ -270,8 +271,14 @@ function App() {
       });
       document.addEventListener( 'keydown', onKeyDown, false );
 
+      var id;
       function animate() {
-        requestAnimationFrame(animate);
+        console.log(isPlaying)
+        if (isPlaying === true) {
+          id = requestAnimationFrame(animate);
+        } else {
+          cancelAnimationFrame( id );
+        }
 
         renderer.render(scene, camera);
 
@@ -288,8 +295,9 @@ function App() {
       
       addSphere();
       addTrees();
-      if (isPlaying === true)
+      if (isPlaying === true) {
         animate();
+      }
   }, []) 
 
   return(
