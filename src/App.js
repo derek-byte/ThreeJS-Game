@@ -258,8 +258,8 @@ function App() {
         for(let i=0; i<trees.length; i++) {
           if(trees[i].position.y-2 < moon.position.y && moon.position.y < trees[i].position.y+2 && trees[i].position.x-2 < moon.position.x && moon.position.x < trees[i].position.x+2) {
             setIsPlaying(false);
-            console.log(trees[i].position, moon.position)
-            console.log("MOON", moon.position.y+8, moon.position.x, moon.position.z)
+            // console.log(trees[i].position, moon.position)
+            // console.log("MOON", moon.position.y+8, moon.position.x, moon.position.z)
           }
         }
       }
@@ -292,13 +292,20 @@ function App() {
 
         controls.update();
       }
+
+      function stopAnimation() {
+        cancelAnimationFrame( id );
+      }
       
       addSphere();
       addTrees();
       if (isPlaying === true) {
         animate();
+      } else {
+        stopAnimation();
+        console.log("GAME OVER")
       }
-  }, []) 
+  }, [isPlaying]) 
 
   return(
     <div className='App'>
